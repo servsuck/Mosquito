@@ -1,4 +1,4 @@
-# Deploy Keras Model with Flask as Web App in 10 Minutes
+# Deploy Keras Model with Flask as Web App and API service
 
 
 - Clone this repo 
