@@ -1,5 +1,5 @@
 import os
-import sys, cv2
+import sys, cv2 
 
 # Flask
 from flask import Flask, redirect, url_for, request, render_template, Response, jsonify, redirect
@@ -10,7 +10,7 @@ from gevent.pywsgi import WSGIServer
 import tensorflow as tf
 from tensorflow import keras
 
-from tensorflow.keras.applications.imagenet_utils import preprocess_input, decode_predictions
+#from tensorflow.keras.applications.imagenet_utils import preprocess_input, decode_predictions
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
 
@@ -18,6 +18,7 @@ from tensorflow.keras.preprocessing import image
 import numpy as np
 from util import base64_to_pil
 
+import urllib.request
 
 # Declare a flask app
 app = Flask(__name__)
@@ -82,17 +83,28 @@ def predict():
 
         # Make prediction
         preds = model_predict('image.jpg', model)
+        
         label = ['Aedes','Culex']
         result = label[np.argmax(preds)]
-        # Process your result for human
-        #pred_proba = "{:.3f}".format(np.amax(preds))    # Max probability
-        #pred_class = decode_predictions(preds, top=1)   # ImageNet Decode
-
-        #result = str(pred_class[0][0][1])               # Convert to string
-        #result = result.replace('_', ' ').capitalize()
         
-        # Serialize the result, you can add additional fields
         return jsonify(result=str(result))
+
+    return None
+@app.route('/api', methods=['GET', 'POST'])
+def api():
+    if request.method == 'GET':
+        
+        imgurl =request.args.get('img')
+        urllib.request.urlretrieve(imgurl, "image.jpg")
+
+
+        # Make prediction
+        preds = model_predict('image.jpg', model)
+        print(preds)
+        label = ['Aedes','Culex']
+        result = label[np.argmax(preds)]
+        prob = np.max(preds)
+        return jsonify(result=str(result),prob = str(prob))
 
     return None
 
