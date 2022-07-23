@@ -1,18 +1,13 @@
 import os
-import sys, cv2 
+import cv2 
 
 # Flask
 from flask import Flask, redirect, url_for, request, render_template, Response, jsonify, redirect
-from werkzeug.utils import secure_filename
+
 from gevent.pywsgi import WSGIServer
 
-# TensorFlow and tf.keras
-import tensorflow as tf
-from tensorflow import keras
-
-#from tensorflow.keras.applications.imagenet_utils import preprocess_input, decode_predictions
 from tensorflow.keras.models import load_model
-from tensorflow.keras.preprocessing import image
+
 
 # Some utilites
 import numpy as np
@@ -24,12 +19,6 @@ import urllib.request
 app = Flask(__name__)
 
 
-# You can use pretrained model from Keras
-# Check https://keras.io/applications/
-# or https://www.tensorflow.org/api_docs/python/tf/keras/applications
-
-# from tensorflow.keras.applications.mobilenet_v2 import MobileNetV2
-# model = MobileNetV2(weights='imagenet')
 
 print('Model loaded. Check http://127.0.0.1:5000/')
 
@@ -52,15 +41,7 @@ def model_predict(img, model):
     img = img.astype('float32')
     img /= 255
     img = np.reshape(img ,(1,128,128,3))
-    # Preprocessing the image
-    #x = image.img_to_array(img)
-    # x = np.true_divide(x, 255)
-    #x = np.expand_dims(x, axis=0)
 
-    # Be careful how your trained model deals with the input
-    # otherwise, it won't make correct prediction!
-    #x = preprocess_input(x, mode='tf')
-    #preds = img.shape
     preds = model.predict(img)
     return preds
 
@@ -112,6 +93,3 @@ def api():
 if __name__ == '__main__':
     app.run(port=5000, threaded=False, debug=True)
 
-    # Serve the app with gevent
-    #http_server = WSGIServer(('0.0.0.0', 5000), app)
-    #http_server.serve_forever()
